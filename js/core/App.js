@@ -1,5 +1,4 @@
-import Scene from "./scene.js";
-
+import Scene from "./Scene.js";
 const scene = new Scene();
 
 function animate(){

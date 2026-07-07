@@ -1,4 +1,4 @@
-import StarManager from "./starManager.js";
+import StarManager from "../managers/StarManager.js";
 export default class Scene {
 
     constructor(){
