@@ -71,20 +71,20 @@ export default class WorldLayer {
 
     draw() {
 
-        if (!this.asset) return;
+    if (!this.asset) return;
 
-        this.renderer.draw({
+    this.renderer.drawImage(
 
-            ascii: this.asset,
+        this.asset,
 
-            x: this.x,
+        this.x,
 
-            y: this.y,
+        this.y,
 
-            opacity: this.opacity
+        this.opacity
 
-        });
+    );
 
-    }
+}
 
 }

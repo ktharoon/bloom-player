@@ -1,4 +1,5 @@
-
+import WorldLayer from "./WorldLayer.js";
+import world from "../config/world.js";
 import SkyManager from "../managers/SkyManager.js";import AsciiRenderer from "./AsciiRenderer.js";
 import MoonManager from "../managers/MoonManager.js";
 import LayerManager from "./LayerManager.js";
@@ -19,6 +20,23 @@ constructor() {
 
     // 3. Create LayerManager
     this.layerManager = new LayerManager();
+    this.worldLayers = [];
+
+    world.forEach(layerConfig => {
+
+    const layer = new WorldLayer({
+
+        renderer: this.asciiRenderer,
+
+        ...layerConfig
+
+    });
+
+    this.worldLayers.push(layer);
+
+    this.layerManager.add(layer);
+
+});
 
     // 4. Create managers
     this.starManager = new StarManager(
@@ -95,8 +113,8 @@ constructor() {
             this.canvas.width,
             this.canvas.height
         );
+        this.layerManager.update();
         this.layerManager.render(ctx);
-
     }
 
 }
