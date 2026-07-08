@@ -1,22 +1,47 @@
+
+import SkyManager from "../managers/SkyManager.js";import AsciiRenderer from "./AsciiRenderer.js";
+import MoonManager from "../managers/MoonManager.js";
+import LayerManager from "./LayerManager.js";
 import StarManager from "../managers/StarManager.js";
 export default class Scene {
 
-    constructor(){
+constructor() {
 
-        this.canvas = document.getElementById("world");
+    // 1. Get canvas first
+    this.canvas = document.getElementById("world");
+    this.ctx = this.canvas.getContext("2d");
 
-        this.ctx = this.canvas.getContext("2d");
+    this.asciiRenderer = new AsciiRenderer(this.ctx);
+    this.skyManager = new SkyManager(this.asciiRenderer);
 
-        this.resize();
-        this.starManager =
-            new StarManager(
-               this.canvas.width,
-                this.canvas.height
-            );
+    // 2. Resize canvas
+    this.resize();
 
-        window.addEventListener("resize", () => this.resize());
+    // 3. Create LayerManager
+    this.layerManager = new LayerManager();
 
-    }
+    // 4. Create managers
+    this.starManager = new StarManager(
+        this.canvas.width,
+        this.canvas.height
+    );
+
+    this.moonManager = new MoonManager(
+        this.canvas.width,
+        this.canvas.height
+    );
+
+    // 5. Add them to LayerManager
+    this.layerManager.add(this.skyManager);
+    this.layerManager.add(this.starManager);
+    this.layerManager.add(this.moonManager);
+
+    // 6. Listen for resize
+    window.addEventListener("resize", () => this.resize());
+
+}
+
+        
 
     resize(){
 
@@ -31,10 +56,19 @@ export default class Scene {
       );
 
     }
+        if(this.moonManager){
+
+            this.moonManager.resize(
+                this.canvas.width,
+                this.canvas.height
+            );
+
+        }
 
     }
 
     render(){
+        console.log("Scene render");
 
         const ctx = this.ctx;
 
@@ -61,9 +95,7 @@ export default class Scene {
             this.canvas.width,
             this.canvas.height
         );
-        this.starManager.update();
-
-        this.starManager.draw(ctx);
+        this.layerManager.render(ctx);
 
     }
 
