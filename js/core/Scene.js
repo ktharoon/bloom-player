@@ -1,120 +1,164 @@
-import WorldLayer from "./WorldLayer.js";
-import world from "../config/world.js";
-import SkyManager from "../managers/SkyManager.js";import AsciiRenderer from "./AsciiRenderer.js";
-import MoonManager from "../managers/MoonManager.js";
+import Camera from "./Camera.js";
+import AsciiRenderer from "./AsciiRenderer.js";
 import LayerManager from "./LayerManager.js";
+import WorldLayer from "./WorldLayer.js";
+
+import world from "../config/world.js";
+
+import SkyManager from "../managers/SkyManager.js";
 import StarManager from "../managers/StarManager.js";
+import MoonManager from "../managers/MoonManager.js";
+
 export default class Scene {
 
-constructor() {
+    constructor() {
 
-    // 1. Get canvas first
-    this.canvas = document.getElementById("world");
-    this.ctx = this.canvas.getContext("2d");
+        // Canvas
+        this.canvas = document.getElementById("world");
+        this.ctx = this.canvas.getContext("2d");
 
-    this.asciiRenderer = new AsciiRenderer(this.ctx);
-    this.skyManager = new SkyManager(this.asciiRenderer);
+        // Core Systems
+        this.camera = new Camera();
+        this.asciiRenderer = new AsciiRenderer(this.ctx);
+        this.asciiRenderer.camera = this.camera;
 
-    // 2. Resize canvas
-    this.resize();
+        this.layerManager = new LayerManager();
 
-    // 3. Create LayerManager
-    this.layerManager = new LayerManager();
-    this.worldLayers = [];
+        // Resize first
+        this.resize();
 
-    world.forEach(layerConfig => {
+        // World Layers (future PNG layers)
+        this.worldLayers = [];
 
-    const layer = new WorldLayer({
+        world.forEach(layerConfig => {
 
-        renderer: this.asciiRenderer,
+            const layer = new WorldLayer({
 
-        ...layerConfig
+                renderer: this.asciiRenderer,
 
-    });
+                ...layerConfig
 
-    this.worldLayers.push(layer);
+            });
 
-    this.layerManager.add(layer);
+            this.worldLayers.push(layer);
 
-});
+            this.layerManager.add(layer);
 
-    // 4. Create managers
-    this.starManager = new StarManager(
-        this.canvas.width,
-        this.canvas.height
-    );
+        });
 
-    this.moonManager = new MoonManager(
-        this.canvas.width,
-        this.canvas.height
-    );
+        // Temporary Managers
+        // (We'll replace these gradually once the PNG assets are live.)
 
-    // 5. Add them to LayerManager
-    this.layerManager.add(this.skyManager);
-    this.layerManager.add(this.starManager);
-    this.layerManager.add(this.moonManager);
+        this.skyManager = new SkyManager(this.asciiRenderer);
 
-    // 6. Listen for resize
-    window.addEventListener("resize", () => this.resize());
+        this.starManager = new StarManager(
 
-}
+            this.canvas.width,
 
-        
+            this.canvas.height
 
-    resize(){
+        );
 
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
+        this.moonManager = new MoonManager(
 
-         if(this.starManager){
+            this.canvas.width,
 
-           this.starManager.resize(
-               this.canvas.width,
-               this.canvas.height
-      );
+            this.canvas.height
+
+        );
+
+        this.layerManager.add(this.skyManager);
+        this.layerManager.add(this.starManager);
+        this.layerManager.add(this.moonManager);
+
+        window.addEventListener("resize", () => this.resize());
 
     }
-        if(this.moonManager){
+
+    resize() {
+
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+
+        if (this.starManager) {
+
+            this.starManager.resize(
+
+                this.canvas.width,
+
+                this.canvas.height
+
+            );
+
+        }
+
+        if (this.moonManager) {
 
             this.moonManager.resize(
+
                 this.canvas.width,
+
                 this.canvas.height
+
             );
 
         }
 
     }
 
-    render(){
-        console.log("Scene render");
+    render() {
+
+        this.camera.update();
 
         const ctx = this.ctx;
 
-        ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        ctx.clearRect(
 
-        // Sky Gradient
+            0,
 
-        const gradient = ctx.createLinearGradient(
             0,
-            0,
-            0,
+
+            this.canvas.width,
+
             this.canvas.height
+
         );
 
-        gradient.addColorStop(0,"#16213f");
-        gradient.addColorStop(.5,"#0d1426");
-        gradient.addColorStop(1,"#05070d");
+        // Night Sky
+
+        const gradient = ctx.createLinearGradient(
+
+            0,
+
+            0,
+
+            0,
+
+            this.canvas.height
+
+        );
+
+        gradient.addColorStop(0, "#16213f");
+        gradient.addColorStop(0.5, "#0d1426");
+        gradient.addColorStop(1, "#05070d");
 
         ctx.fillStyle = gradient;
 
         ctx.fillRect(
+
             0,
+
             0,
+
             this.canvas.width,
+
             this.canvas.height
+
         );
+
         this.layerManager.update();
         this.layerManager.render(ctx);
+
     }
 
 }

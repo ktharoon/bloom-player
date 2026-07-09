@@ -1,13 +1,18 @@
 export default class WorldLayer {
 
     constructor({
+
         renderer,
+
         asset = null,
 
         x = 0,
         y = 0,
 
-        depth = 1,
+        width = null,
+        height = null,
+
+        depth = 0,
 
         opacity = 1,
 
@@ -18,9 +23,11 @@ export default class WorldLayer {
         sway = false,
 
         glow = false
+
     }) {
 
         this.renderer = renderer;
+
         this.asset = asset;
 
         this.baseX = x;
@@ -28,6 +35,9 @@ export default class WorldLayer {
 
         this.x = x;
         this.y = y;
+
+        this.width = width;
+        this.height = height;
 
         this.depth = depth;
 
@@ -40,51 +50,180 @@ export default class WorldLayer {
         this.glow = glow;
 
         this.time = Math.random() * Math.PI * 2;
+
     }
 
     update() {
 
-        // Advance animation time
         this.time += 0.01;
 
-        // Horizontal movement (clouds)
+        // Horizontal drifting (clouds)
         this.x += this.speed;
 
-        // Screen wrapping
         if (this.x > window.innerWidth + 500) {
+
             this.x = -500;
+
         }
 
-        // Gentle floating (moon, clouds)
+        // Gentle floating (moon / clouds)
         if (this.floating) {
+
             this.y = this.baseY + Math.sin(this.time) * 2;
-        }
-
-        // Placeholder for future flower sway
-        if (this.sway) {
-
-            // We'll connect this to the wind engine later.
 
         }
+
+        // Flower sway will be connected to the wind engine later.
 
     }
 
-    draw() {
+    draw(ctx) {
 
-    if (!this.asset) return;
+        // ---------- PNG Rendering ----------
 
-    this.renderer.drawImage(
+        if (this.asset instanceof Image) {
 
-        this.asset,
+            this.renderer.drawImage({
 
-        this.x,
+                image: this.asset,
 
-        this.y,
+                x: this.x,
 
-        this.opacity
+                y: this.y,
 
-    );
+                width: this.width,
 
-}
+                height: this.height,
+
+                opacity: this.opacity,
+
+                depth: this.depth
+
+            });
+
+            return;
+
+        }
+
+        // ---------- Placeholder Rendering ----------
+
+        const offsetX = this.renderer.camera
+            ? this.renderer.camera.x * this.depth
+            : 0;
+
+        const offsetY = this.renderer.camera
+            ? this.renderer.camera.y * this.depth
+            : 0;
+
+        ctx.save();
+
+        ctx.globalAlpha = this.opacity;
+
+        switch (this.asset) {
+
+            case "sky":
+
+                // Gradient already drawn by Scene.js
+                break;
+
+            case "moon":
+
+                ctx.fillStyle = "#f8f4d8";
+
+                ctx.beginPath();
+
+                ctx.arc(
+
+                    this.x + offsetX,
+
+                    this.y + offsetY,
+
+                    55,
+
+                    0,
+
+                    Math.PI * 2
+
+                );
+
+                ctx.fill();
+
+                break;
+
+            case "cloud":
+
+                ctx.fillStyle = "rgba(255,255,255,0.18)";
+
+                ctx.fillRect(
+
+                    this.x + offsetX,
+
+                    this.y + offsetY,
+
+                    180,
+
+                    40
+
+                );
+
+                break;
+
+            case "mountains":
+
+                ctx.fillStyle = "#202733";
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+
+                    offsetX,
+
+                    window.innerHeight
+
+                );
+
+                ctx.lineTo(
+
+                    250 + offsetX,
+
+                    250 + offsetY
+
+                );
+
+                ctx.lineTo(
+
+                    500 + offsetX,
+
+                    window.innerHeight
+
+                );
+
+                ctx.fill();
+
+                break;
+
+            case "flowers":
+
+                ctx.fillStyle = "#587c58";
+
+                ctx.fillRect(
+
+                    offsetX,
+
+                    window.innerHeight - 120 + offsetY,
+
+                    window.innerWidth,
+
+                    120
+
+                );
+
+                break;
+
+        }
+
+        ctx.restore();
+
+    }
 
 }
