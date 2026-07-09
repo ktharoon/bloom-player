@@ -1,58 +1,77 @@
-const world = [
+export default [
+
     {
         id: "sky",
+
         asset: "assets/ascii/sky/sky.png",
+
         x: 0,
         y: 0,
+
+        width: window.innerWidth,
+        height: window.innerHeight,
+
         depth: 0,
-        speed: 0,
+
         opacity: 1
     },
 
     {
         id: "moon",
-        asset: "assets/ascii/moon/moon.png",
+
+        asset: null,
+
         x: 900,
-        y: 80,
-        depth: 0.1,
-        floating: true,
-        glow: true
+        y: 120,
+
+        depth: 0.03,
+
+        opacity: 1,
+
+        floating: true
     },
 
     {
-        id: "cloud1",
-        asset: "assets/ascii/clouds/cloud1.png",
+        id: "cloud",
+
+        asset: null,
+
         x: 150,
-        y: 100,
-        depth: 0.2,
-        speed: 0.02
-    },
+        y: 140,
 
-    {
-        id: "cloud2",
-        asset: "assets/ascii/clouds/cloud2.png",
-        x: 1100,
-        y: 160,
-        depth: 0.25,
-        speed: 0.015
+        depth: 0.08,
+
+        opacity: 0.9,
+
+        speed: 0.08,
+
+        floating: true
     },
 
     {
         id: "mountains",
-        asset: "assets/ascii/mountains/mountains.png",
+
+        asset: null,
+
         x: 0,
-        y: 220,
-        depth: 0.8
+        y: 0,
+
+        depth: 0.15,
+
+        opacity: 1
     },
 
     {
         id: "flowers",
-        asset: "assets/ascii/flowers/flowers.png",
-        x: 0,
-        y: 520,
-        depth: 1,
-        sway: true
-    }
-];
 
-export default world;
+        asset: null,
+
+        x: 0,
+        y: 0,
+
+        depth: 0.25,
+
+        opacity: 1
+    }
+
+];

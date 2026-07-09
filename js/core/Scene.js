@@ -30,21 +30,33 @@ export default class Scene {
         // World Layers (future PNG layers)
         this.worldLayers = [];
 
+        this.worldLayers = [];
+
         world.forEach(layerConfig => {
 
-            const layer = new WorldLayer({
+        const image = new Image();
 
-                renderer: this.asciiRenderer,
+        image.src = layerConfig.asset;
 
-                ...layerConfig
+        image.onload = () => {
 
-            });
+        layer.asset = image;
 
-            this.worldLayers.push(layer);
+    };
 
-            this.layerManager.add(layer);
+    const layer = new WorldLayer({
 
-        });
+        renderer: this.asciiRenderer,
+
+        ...layerConfig
+
+    });
+
+    this.worldLayers.push(layer);
+
+    this.layerManager.add(layer);
+
+});
 
         // Temporary Managers
         // (We'll replace these gradually once the PNG assets are live.)
