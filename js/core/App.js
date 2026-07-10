@@ -1,14 +1,29 @@
 import Scene from "./Scene.js";
-const scene = new Scene();
 
-function animate(){
+class App {
 
-    scene.render();
+    constructor() {
 
-    requestAnimationFrame(animate);
+        this.scene = new Scene();
+
+        this.start();
+
+    }
+
+    start() {
+
+        const animate = () => {
+
+            this.scene.render();
+
+            requestAnimationFrame(animate);
+
+        };
+
+        animate();
+
+    }
 
 }
 
-animate();
-
-console.log("🌙 BloomPlayer Engine Started");
+new App();

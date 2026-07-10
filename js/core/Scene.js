@@ -5,7 +5,6 @@ import WorldLayer from "./WorldLayer.js";
 
 import world from "../config/world.js";
 
-import SkyManager from "../managers/SkyManager.js";
 import StarManager from "../managers/StarManager.js";
 import MoonManager from "../managers/MoonManager.js";
 
@@ -17,69 +16,67 @@ export default class Scene {
         this.canvas = document.getElementById("world");
         this.ctx = this.canvas.getContext("2d");
 
-        // Core Systems
+        // Core
         this.camera = new Camera();
+
         this.asciiRenderer = new AsciiRenderer(this.ctx);
         this.asciiRenderer.camera = this.camera;
 
         this.layerManager = new LayerManager();
 
-        // Resize first
         this.resize();
 
-        // World Layers (future PNG layers)
-        this.worldLayers = [];
-
+        // World
         this.worldLayers = [];
 
         world.forEach(layerConfig => {
 
-        const image = new Image();
+            const layer = new WorldLayer({
 
-        image.src = layerConfig.asset;
+                renderer: this.asciiRenderer,
 
-        image.onload = () => {
+                ...layerConfig
 
-        layer.asset = image;
+            });
 
-    };
+            this.worldLayers.push(layer);
+            this.layerManager.add(layer);
 
-    const layer = new WorldLayer({
+            if (typeof layerConfig.asset === "string") {
 
-        renderer: this.asciiRenderer,
+                const image = new Image();
 
-        ...layerConfig
+                image.onload = () => {
 
-    });
+                    console.log("Loaded:", layerConfig.asset);
 
-    this.worldLayers.push(layer);
+                    layer.asset = image;
 
-    this.layerManager.add(layer);
+                };
 
-});
+                image.onerror = () => {
 
-        // Temporary Managers
-        // (We'll replace these gradually once the PNG assets are live.)
+                    console.error("Failed:", layerConfig.asset);
 
-        this.skyManager = new SkyManager(this.asciiRenderer);
+                };
 
+                image.src = layerConfig.asset;
+
+            }
+
+        });
+
+        // Existing managers (temporary)
         this.starManager = new StarManager(
-
             this.canvas.width,
-
             this.canvas.height
-
         );
 
         this.moonManager = new MoonManager(
-
             this.canvas.width,
-
             this.canvas.height
-
         );
 
-        this.layerManager.add(this.skyManager);
         this.layerManager.add(this.starManager);
         this.layerManager.add(this.moonManager);
 
@@ -95,11 +92,8 @@ export default class Scene {
         if (this.starManager) {
 
             this.starManager.resize(
-
                 this.canvas.width,
-
                 this.canvas.height
-
             );
 
         }
@@ -107,11 +101,8 @@ export default class Scene {
         if (this.moonManager) {
 
             this.moonManager.resize(
-
                 this.canvas.width,
-
                 this.canvas.height
-
             );
 
         }
@@ -125,29 +116,17 @@ export default class Scene {
         const ctx = this.ctx;
 
         ctx.clearRect(
-
             0,
-
             0,
-
             this.canvas.width,
-
             this.canvas.height
-
         );
 
-        // Night Sky
-
         const gradient = ctx.createLinearGradient(
-
             0,
-
             0,
-
             0,
-
             this.canvas.height
-
         );
 
         gradient.addColorStop(0, "#16213f");
@@ -155,18 +134,7 @@ export default class Scene {
         gradient.addColorStop(1, "#05070d");
 
         ctx.fillStyle = gradient;
-
-        ctx.fillRect(
-
-            0,
-
-            0,
-
-            this.canvas.width,
-
-            this.canvas.height
-
-        );
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.layerManager.update();
         this.layerManager.render(ctx);
