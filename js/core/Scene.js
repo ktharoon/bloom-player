@@ -50,6 +50,8 @@ export default class Scene {
 
                     console.log("Loaded:", layerConfig.asset);
 
+                    console.log(image.width, image.height);
+
                     layer.asset = image;
 
                 };

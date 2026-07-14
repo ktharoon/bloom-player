@@ -1,33 +1,23 @@
 export default class AsciiRenderer {
 
     constructor(ctx) {
-
         this.ctx = ctx;
-
-        // Assigned by Scene.js
         this.camera = null;
-
     }
 
     drawImage({
-
         image,
-
-        x,
-
-        y,
-
+        x = 0,
+        y = 0,
         width = null,
-
         height = null,
-
         opacity = 1,
-
         depth = 0
-
     }) {
 
-        if (!image) return;
+        if (!(image instanceof HTMLImageElement)) {
+            return;
+        }
 
         const offsetX = this.camera
             ? this.camera.x * depth
@@ -41,40 +31,15 @@ export default class AsciiRenderer {
 
         this.ctx.globalAlpha = opacity;
 
-        if (width && height) {
-
-            this.ctx.drawImage(
-
-                image,
-
-                x + offsetX,
-
-                y + offsetY,
-
-                width,
-
-                height
-
-            );
-
-        }
-
-        else {
-
-            this.ctx.drawImage(
-
-                image,
-
-                x + offsetX,
-
-                y + offsetY
-
-            );
-
-        }
+        this.ctx.drawImage(
+            image,
+            x + offsetX,
+            y + offsetY,
+            width ?? image.width,
+            height ?? image.height
+        );
 
         this.ctx.restore();
-
     }
 
 }

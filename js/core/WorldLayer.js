@@ -26,10 +26,11 @@ export default class WorldLayer {
 
     }) {
 
+        // Core
         this.renderer = renderer;
-
         this.asset = asset;
 
+        // Position
         this.baseX = x;
         this.baseY = y;
 
@@ -39,60 +40,50 @@ export default class WorldLayer {
         this.width = width;
         this.height = height;
 
+        // Visual
         this.depth = depth;
-
         this.opacity = opacity;
 
+        // Animation
         this.speed = speed;
-
         this.floating = floating;
         this.sway = sway;
         this.glow = glow;
 
         this.time = Math.random() * Math.PI * 2;
-
     }
 
     update() {
 
         this.time += 0.01;
 
-        // Horizontal drifting (clouds)
+        // Cloud movement
         this.x += this.speed;
 
         if (this.x > window.innerWidth + 500) {
-
             this.x = -500;
-
         }
 
-        // Gentle floating (moon / clouds)
+        // Gentle floating
         if (this.floating) {
-
             this.y = this.baseY + Math.sin(this.time) * 2;
-
         }
-
-        // Flower sway will be connected to the wind engine later.
 
     }
 
     draw(ctx) {
 
-        // ---------- PNG Rendering ----------
-
-        if (this.asset instanceof Image) {
+        // ---------- PNG ----------
+        if (this.asset instanceof HTMLImageElement) {
 
             this.renderer.drawImage({
 
                 image: this.asset,
 
                 x: this.x,
-
                 y: this.y,
 
                 width: this.width,
-
                 height: this.height,
 
                 opacity: this.opacity,
@@ -102,10 +93,9 @@ export default class WorldLayer {
             });
 
             return;
-
         }
 
-        // ---------- Placeholder Rendering ----------
+        // ---------- Placeholders ----------
 
         const offsetX = this.renderer.camera
             ? this.renderer.camera.x * this.depth
@@ -121,11 +111,6 @@ export default class WorldLayer {
 
         switch (this.asset) {
 
-            case "sky":
-
-                // Gradient already drawn by Scene.js
-                break;
-
             case "moon":
 
                 ctx.fillStyle = "#f8f4d8";
@@ -133,17 +118,11 @@ export default class WorldLayer {
                 ctx.beginPath();
 
                 ctx.arc(
-
                     this.x + offsetX,
-
                     this.y + offsetY,
-
                     55,
-
                     0,
-
                     Math.PI * 2
-
                 );
 
                 ctx.fill();
@@ -152,18 +131,13 @@ export default class WorldLayer {
 
             case "cloud":
 
-                ctx.fillStyle = "rgba(255,255,255,0.18)";
+                ctx.fillStyle = "rgba(255,255,255,.18)";
 
                 ctx.fillRect(
-
                     this.x + offsetX,
-
                     this.y + offsetY,
-
                     180,
-
                     40
-
                 );
 
                 break;
@@ -175,28 +149,21 @@ export default class WorldLayer {
                 ctx.beginPath();
 
                 ctx.moveTo(
-
                     offsetX,
-
                     window.innerHeight
-
                 );
 
                 ctx.lineTo(
-
                     250 + offsetX,
-
                     250 + offsetY
-
                 );
 
                 ctx.lineTo(
-
                     500 + offsetX,
-
                     window.innerHeight
-
                 );
+
+                ctx.closePath();
 
                 ctx.fill();
 
@@ -207,23 +174,16 @@ export default class WorldLayer {
                 ctx.fillStyle = "#587c58";
 
                 ctx.fillRect(
-
                     offsetX,
-
                     window.innerHeight - 120 + offsetY,
-
                     window.innerWidth,
-
                     120
-
                 );
 
                 break;
-
         }
 
         ctx.restore();
-
     }
 
 }
